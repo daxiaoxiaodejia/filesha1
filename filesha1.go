@@ -3,7 +3,6 @@ package filesha1
 import (
 	"crypto/sha1"
 	"encoding/json"
-	"filesha1/pkg/log"
 	"fmt"
 	"io"
 	"os"
@@ -20,7 +19,7 @@ type FileSha1 struct {
 
 func NewFileSha1(config string) (fileSha1 *FileSha1, err error) {
 	fileSha1 = &FileSha1{}
-	log.Debug("配置%s", config)
+	fmt.Println("配置%s", config)
 	err = json.Unmarshal([]byte(config), fileSha1)
 	return fileSha1, err
 }
@@ -69,12 +68,12 @@ func (c *FileSha1) initialize() {
 	if checkFileIsExist(c.OutputFileName) { //如果文件存在
 		c.OutFile, err1 = os.OpenFile(c.OutputFileName, os.O_APPEND|os.O_WRONLY, os.ModeAppend) //打开文件
 		if err1 != nil {
-			log.Error(err1.Error())
+			fmt.Println(err1.Error())
 		}
 	} else {
 		c.OutFile, err1 = os.Create(c.OutputFileName) //创建文件
 		if err1 != nil {
-			log.Error(err1.Error())
+			fmt.Println(err1.Error())
 		}
 	}
 }
@@ -87,11 +86,11 @@ func (c *FileSha1) isExclude(path string) bool {
 		//		ok, err := filepath.Match(value, path)
 		ok, err := regexp.Match(value, []byte(path))
 		if err != nil {
-			log.Error(err.Error())
+			fmt.Println(err.Error())
 			continue
 		}
 		if ok {
-			log.Debug("过滤路径： %s, 过滤规则： %s", path, value)
+			//			log.Debug("过滤路径： %s, 过滤规则： %s", path, value)
 			return true
 		}
 	}
@@ -115,7 +114,7 @@ func (c *FileSha1) GenerateSha1(path string, f os.FileInfo) {
 	sha1StringInfo := fmt.Sprintf("path: %s, sha1: %x, size: %d \n", path, h.Sum(nil), f.Size())
 	_, err = io.WriteString(c.OutFile, sha1StringInfo)
 	if err != nil {
-		log.Error(err.Error())
+		fmt.Println(err.Error())
 	}
 }
 
