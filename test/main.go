@@ -20,13 +20,13 @@ func main() {
 	}
 	fileSha1.HandleFilelist()
 
-	fileSha1, err = filesha1.NewFileSha1(`{"root":"file","outputFile":"2.txt","exclude":["pkg","nism","/*base/"]}`)
+	fileSha1, err = filesha1.NewFileSha1(`{"root":"file","outputFile":"2.txt","exclude":["pkg","/nism","/*base/"]}`)
 	if err != nil {
 		log.Debug(err.Error())
 	}
 	fileSha1.HandleFilelist()
 
-	fileSha1, err = filesha1.NewFileSha1(`{"root":"file","outputFile":"3.txt","exclude":["*.go","pkg","*.log","controllers/"]}`)
+	fileSha1, err = filesha1.NewFileSha1(`{"root":"../../file/","outputFile":"3.txt","exclude":["*.go","pkg","*.log","controllers/"]}`)
 	if err != nil {
 		log.Debug(err.Error())
 	}

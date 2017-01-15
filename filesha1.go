@@ -19,7 +19,7 @@ type FileSha1 struct {
 
 func NewFileSha1(config string) (fileSha1 *FileSha1, err error) {
 	fileSha1 = &FileSha1{}
-	fmt.Println("配置%s", config)
+	fmt.Printf("配置： %s", config)
 	err = json.Unmarshal([]byte(config), fileSha1)
 	return fileSha1, err
 }
@@ -33,13 +33,23 @@ func (c *FileSha1) HandleFilelist() error {
 		if f == nil {
 			return err
 		}
+		fmt.Printf("过滤文件： %s \n", path)
 		if f.IsDir() {
-			return nil
+			path = path + string(os.PathSeparator)
+			if c.isExclude(path) {
+				fmt.Printf("#######################： %s \n", path)
+				return filepath.SkipDir
+			} else {
+				return nil
+			}
+		} else {
+			if c.isExclude(path) {
+				fmt.Printf("**********************： %s \n", path)
+				return nil
+			} else {
+				c.GenerateSha1(path, f)
+			}
 		}
-		if c.isExclude(path) {
-			return nil
-		}
-		c.GenerateSha1(path, f)
 		return nil
 	})
 	if c.OutFile != nil {
@@ -59,7 +69,10 @@ func (c *FileSha1) initialize() {
 		filepath.FromSlash(c.Exclude[index])
 		filepath.Clean(c.Exclude[index])
 		//		c.Exclude[index] = c.Root + string(os.PathSeparator) + "*" + string(os.PathSeparator) + c.Exclude[index] + "*"
-		c.Exclude[index] = string(os.PathSeparator) + c.Exclude[index]
+		if c.Exclude[index][0] != os.PathSeparator {
+			fmt.Printf("首字符： %s \n", c.Exclude[index][0])
+			c.Exclude[index] = string(os.PathSeparator) + c.Exclude[index]
+		}
 	}
 	// 处理输出文件
 	var err1 error
@@ -82,15 +95,22 @@ func (c *FileSha1) initialize() {
 *判断是否过滤
  */
 func (c *FileSha1) isExclude(path string) bool {
+	pathArray := []byte(path)[len(c.Root):]
+	path = string(pathArray)
+	if path[0] != os.PathSeparator {
+		fmt.Printf("###首字符： %s \n", path)
+		path = string(os.PathSeparator) + path
+	}
 	for _, value := range c.Exclude {
 		//		ok, err := filepath.Match(value, path)
 		ok, err := regexp.Match(value, []byte(path))
 		if err != nil {
 			fmt.Println(err.Error())
+			fmt.Printf("错误路径： %s, 错误规则： %s \n", path, value)
 			continue
 		}
 		if ok {
-			//			log.Debug("过滤路径： %s, 过滤规则： %s", path, value)
+			fmt.Printf("过滤路径： %s, 过滤规则： %s \n", path, value)
 			return true
 		}
 	}
