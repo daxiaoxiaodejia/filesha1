@@ -12,10 +12,11 @@
 
 # 过滤规则
 
-* 只忽略excludeLable目录，不忽略excludeLable文件
-	*excludeLable/
-
+* 只忽略excludeLable目录，不忽略excludeLable文件  
+	* excludeLable/ 
+	
 * 忽略excludeLable文件和excludeLable目录
-	*excludeLable
+	* excludeLable
 
 * excludeLable支持正则表达式
+ 
